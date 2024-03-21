@@ -34,7 +34,7 @@ public class LoginController {
            
             customer.setCreateDt(new Timestamp(System.currentTimeMillis()));
             
-            savedCustomer = customerRepository.save(customer);
+            savedCustomer = customerRepository.save(customer);            
             if (savedCustomer.getId() > 0) {
                 response = ResponseEntity
                         .status(HttpStatus.CREATED)

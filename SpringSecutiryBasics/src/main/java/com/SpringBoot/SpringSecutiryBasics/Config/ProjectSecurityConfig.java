@@ -15,13 +15,16 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import com.SpringBoot.SpringSecutiryBasics.filter.AuthoritiesLoggingAfterFilter;
+import com.SpringBoot.SpringSecutiryBasics.filter.AuthoritiesLoggingAtFilter;
 import com.SpringBoot.SpringSecutiryBasics.filter.CsrfCookieFilter;
+import com.SpringBoot.SpringSecutiryBasics.filter.RequestValidationBeforeFilter;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @Configuration
 public class ProjectSecurityConfig { 
-	  @Bean
+	 @Bean
 	    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 	        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
 	        requestHandler.setCsrfRequestAttributeName("_csrf");
@@ -41,6 +44,9 @@ public class ProjectSecurityConfig {
 	                })).csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact","/register")
 	                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 	                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+	                .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class)
+	                .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+                    .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
 	                .authorizeHttpRequests((requests)->requests
 	                        /*.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
 	                        .requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT","VIEWBALANCE")
@@ -56,6 +62,7 @@ public class ProjectSecurityConfig {
 	                .httpBasic(Customizer.withDefaults());
 	        return http.build();
 	    }
+
 
 	    @Bean
 	    public PasswordEncoder passwordEncoder() {
